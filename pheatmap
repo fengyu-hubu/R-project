@@ -27,7 +27,7 @@ a=p #将pheatmap的结果输出到a中
 #给矩阵（data）中行和列不同的分组注释，假如有两个文件，第一个文件为行注释，
 #其第一列与矩阵中的第一列内容相同（顺序没有关系），其它列为第一列的不同的
 #标记如对应不同基因的分组或者类型；第二个文件为列注释，其第一列与矩阵中第
-#一行内容相同，其它列则为样品的注释。
+#一行内容相同，其它列则为样品的注释。绘图参数如下：
 #annotation_row = NA, annotation_col = NA,
 #annotation = NA, annotation_colors = NA, annotation_legend = TRUE,
 #annotation_names_row = TRUE, annotation_names_col = TRUE
@@ -40,6 +40,7 @@ newOrder=fpkm[list$tree_row$order,]
 newOrder[,ncol(newOrder)+1]=row_cluster[match(rownames(newOrder),names(row_cluster))]
 colnames(newOrder)[ncol(newOrder)]="Cluster"
 head(newOrder)
+#设置输出的工作目录setwd()
 #setwd("D:../4.heatmap/")
 setwd("E:../代谢组/")
 write.csv(newOrder,file="metabolites_neworder.csv")
