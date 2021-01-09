@@ -1,0 +1,45 @@
+install.packages("pheatmap")
+library(pheatmap)
+#pdf("E:/Reference/Ssientific Data/DEGs1.pdf")
+#fpkm<-read.delim("D:../4.heatmap/DEGs_FC.txt",header = T,row.names = 1)
+#fpkm<-read.csv("E:../data_heatmap.csv",header = T,row.names = 1)
+fpkm<-read.csv("E:../cluster48.csv",header = T,row.names = 1)
+p<-pheatmap(fpkm, scale = "row",cluster_rows = F,cluster_cols = F,
+         #scale均一化，“row”“column”“none”;cluester聚类方式
+         display_numbers = F, number_format = "%.2f", number_color= "black",fontsize_number = 6,
+         #是否显示数字？数字小数点位数、颜色以及大小
+         fontsize_row=8,fontsize_col=8,
+         #行列名称字体大小
+         #cellwidth=10,cellheight=10,#设置格子大小
+         show_colnames=TRUE,show_rownames=TRUE,
+         #是否显示行列名称
+         color=colorRampPalette(c("blue","white","red"))(10000), 
+         #设置颜色
+         #cutree_rows = 10, 
+         #按聚类行分割,gaps_rows在指定行分割，此时行不能聚类，对列也是如此
+         border_color="black", legend=T,legend_breaks=-3:3) 
+         #border_color设置格子框颜色，是否显示legend以及其范围
+#dev.off() 
+ggsave(p,"heatmap.pdf",width=16,height=8,units=c("cm"),useDingbats=FALSE)
+#保存为pdf格式
+a=p #将pheatmap的结果输出到a中 
+
+#给矩阵（data）中行和列不同的分组注释，假如有两个文件，第一个文件为行注释，
+#其第一列与矩阵中的第一列内容相同（顺序没有关系），其它列为第一列的不同的
+#标记如对应不同基因的分组或者类型；第二个文件为列注释，其第一列与矩阵中第
+#一行内容相同，其它列则为样品的注释。
+#annotation_row = NA, annotation_col = NA,
+#annotation = NA, annotation_colors = NA, annotation_legend = TRUE,
+#annotation_names_row = TRUE, annotation_names_col = TRUE
+
+
+###以下命令可以输出与聚类后一致的gene list，并且在gene后标注属于哪个cluster##
+list=pheatmap(fpkm, scale = "row")
+row_cluster=cutree(list$tree_row,k=10)
+newOrder=fpkm[list$tree_row$order,]
+newOrder[,ncol(newOrder)+1]=row_cluster[match(rownames(newOrder),names(row_cluster))]
+colnames(newOrder)[ncol(newOrder)]="Cluster"
+head(newOrder)
+#setwd("D:../4.heatmap/")
+setwd("E:../代谢组/")
+write.csv(newOrder,file="metabolites_neworder.csv")
