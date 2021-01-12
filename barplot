@@ -1,0 +1,69 @@
+#单个柱子柱状图
+#数据格式：第一列样本名称sample，第二列value，第三列误差sd
+library(ggplot2)
+setwd("...数据存储目录...")
+mydata<-read.table("data.txt",header=T,row.names=1,sep="\t",check.names = F)
+p<-ggplot(mydata,aes(x=sample,y=value))+
+  #sample为横轴，value为纵轴
+  geom_bar(aes(fill=sample),stat = "identity")+
+  #geom_bar绘制柱状图，以sample为填充色，stat = "identity"表示直接以value为y值
+  geom_errorbar(aes(ymin=value-sd,ymax=value+sd),position=position_dodge(0.6),width=0.2,size=0.2)+
+  #添加误差线，设置最大最小值，position设置误差线与柱子的相对位置，width宽度，size大小
+  theme_bw()+
+  #设置空白背景
+  ylab("y轴名称")+xlab("x轴名称")+
+  #设置x和y轴标签
+  scale_y_continuous(limits = c(0,20))+
+  #设置y轴区间
+  theme(axis.line = element_line(colour = "black"))+
+  #设置坐标轴线条粗细
+  theme(axis.text.x = element_text(angle=45,hjust=1,vjust = 1,size=8))+
+  #设置x轴文本角度、位置和字体大小
+  theme(text=element_text(family = "Arial",size=8))+
+  #设置字体为Arial
+  coord_flip()
+  #交换x和y轴
+ggsave(p,"barplot.pdf",width=16,height=8,units=c("cm"),useDingbats=FALSE)
+#保存图片
+
+##多样本柱状图，未展示的参数与单个柱子的参数一致
+#geom_bar绘制柱状图，y为固定值
+#产生数据，第一列ge，表示数据值，20个数据；第二列gene1到gene10的循环，第三列sample对样本的分类
+gene_expression <- data.frame(ge=rnorm(20,10,5),
+                              gene=paste("gene",1:10,sep=""),
+                              sample=c(rep("treat",10),rep("control",10)))
+#绘制柱状图，展示全部值，堆砌
+g <- ggplot(gene_expression, aes(gene,ge))
+g+geom_bar(aes(fill=sample),stat="identity")+theme_bw()
+
+#绘制柱状图，展示全部值，并排position = "dodge"
+g <- ggplot(gene_expression, aes(gene,ge))
+g+geom_bar(aes(fill=sample),stat="identity",position = "dodge")+theme_bw()
+
+#绘制柱状图，展示全部值，百分比position = "fill"
+g <- ggplot(gene_expression, aes(gene,ge))
+g+geom_bar(aes(fill=sample),stat="identity",position = "fill")+theme_bw()
+
+#利用geom_text添加数值标签
+g <- ggplot(gene_expression, aes(gene,ge,fill=sample))
+g+geom_bar(stat="identity",position = "dodge")+
+  geom_text(aes(label=round(ge,1)),vjust=0,size=3,position = position_dodge(width=.9))+theme_bw()
+  #label=round(ge,1)表示添加ge数据，round函数保留1位有效数字，vjust调整数值在柱子上的位置
+  #size表示大小
+##其它设置....
+  #scale_y_continuous(expand = c(0, 0))
+  #设置坐标轴从0开始
+  #scale_x_discrete(limits=c("A.G","A.C","A.T","C.T","C.G","C.A"),labels=c("A>G","A>C","A>T","C>T","C>G","C>A"))+
+  #设置x轴label
+  #scale_fill_discrete(limits=c("A.G","A.C","A.T","C.T","C.G","C.A"),labels=c("A>G","A>C","A>T","C>T","C>G","C>A"))+
+  #设置legend的label
+  #theme(axis.line=element_line(size=2),
+ #设置坐标轴线型
+        #axis.text=element_text(size=12,face="bold"),
+#设置坐标轴字体
+        #axis.ticks=element_line(size=2),
+#设置坐标轴ticks的大小
+        #axis.ticks.length=unit(0.25,"cm"),
+#设置坐标轴ticks的长度
+        #axis.title=element_text(size=12,face="bold"))
+#设置坐标轴标题的字体
