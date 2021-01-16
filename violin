@@ -1,0 +1,36 @@
+##violin的绘制和boxplot基本类似
+##只需将geom_boxplot改为geom_violin即可
+##详细参数参照boxplot
+
+library(ggplot2)
+library(ggpubr)
+data("ToothGrowth")
+head(ToothGrowth)
+ggplot(ToothGrowth,aes(as.factor(dose),len))+
+  geom_violin(aes(color=supp))+theme_bw()
+
+ggplot(ToothGrowth,aes(as.factor(dose),len))+
+  geom_violin(aes(color=supp))+
+  labs(x="dose")+
+  stat_compare_means(aes(group=supp),size=2,label="p.format")+theme_bw()
+
+
+##violin图添加errorbar##
+library(ggplot2)
+library(dplyr) #数据处理的包
+mydata<-data.frame('condition'=c(rep('t1',30),rep('t2',30)),
+                   'value'=c(rnorm(30,10,3),rnorm(30,20,7)))
+head(mydata)
+##
+
+errbar_lims<-dplyr::group_by(mydata,condition) %>%
+  dplyr::summarize(mean=mean(value),se=sd(value)/sqrt(n()),
+                   upper=mean+(2*se),lower=mean-(2*se))
+#利用dplyr包下的函数group_by和summarize计算mean和error
+mean_se_violin<-ggplot()+
+  geom_violin(data=mydata,aes(x=condition,y=value,fill=condition),color="black",size=1.5)+
+  geom_point(data=errbar_lims,aes(x=condition,y=mean),size=3)+
+  geom_errorbar(aes(x=errbar_lims$condition,ymax=errbar_lims$upper,
+                    ymin=errbar_lims$lower),stat="identity",width=0.15)+
+  theme_bw()
+print(mean_se_violin)
