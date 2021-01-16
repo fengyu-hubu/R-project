@@ -1,0 +1,54 @@
+install.packages("ggpubr")
+library(ggplot2)
+data("ToothGrowth")
+head(ToothGrowth)
+tail(ToothGrowth)
+#加载数据集ToothGrowth，利用head和tail查看
+
+ggplot(ToothGrowth,aes(dose,len))+
+  geom_boxplot(aes(color=supp))+theme_bw()
+#此时绘制的图形，x轴dose是连续性的，需要转换成离散型的
+
+ggplot(ToothGrowth,aes(as.factor(dose),len))+
+  geom_boxplot(aes(color=supp))
+#利用as.factor将dose转换成因子变量
+
+
+library(ggpubr)
+ggplot(ToothGrowth,aes(as.factor(dose),len))+
+  geom_boxplot(aes(color=supp))+
+  stat_compare_means(aes(group=supp),method="t.test",size=5,label="p.format")+theme_bw()
+#利用ggpubr包添加组间统计检验信息
+#stat_compare_means函数,label表示标注显著性的方式,p.signif,标注显著水平，p.format标注值
+#method,statistic method,including "t.test","anova"
+
+
+###分面
+###第一列，离散型变量all，第二列数据data，第三列分面变量vv
+mydata<-read.table("filename",header=T,row.names = 1,sep="\t",check.names = F)
+ggplot(mydata,aes(all,data))+
+  facet_grid(~vv)+
+  #以vv进行分面，facet_grid分面函数
+  geom_jitter(size=0.5,color="grey")+
+  #添加点图
+  geom_boxplot(color=color,fill=NA,outlier.colour = NA,size=1.5)+
+  #添加boxplot，color需要定义
+  scale_x_discrete(limits=limits)+
+  #设置x轴展示顺序，limits需要定义
+  scale_y_continuous(limits=c(n1,n2),expand = c(0, 0))+
+  #设置y轴范围，expand表示y轴从0开始
+  labs(y="")+
+  theme_bw()+
+  theme(plot.background = element_rect(color="black"),
+        panel.border = element_rect(color = "black",size = 2),
+        #设置边框
+        text=element_text(family = "Arial",size=8),
+        #设置字体和大小
+        axis.text=element_text(size=12,face = "bold"),
+        #x\y文本字体
+        axis.ticks=element_line(size=2),
+        #设置轴须线粗
+        axis.ticks.length = unit(0.25,"cm"),
+        #设置轴须长度
+        axis.title = element_text(size=12,face="bold"))
+        #设置title格式
